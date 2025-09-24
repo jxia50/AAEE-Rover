@@ -22,6 +22,7 @@ void loop() {
   byte yMapped = map(yVal, 0, 1023, 0, 255);
 
   // Send X, Y, D2, D4, D9
+  Serial1.write(255); 
   Serial1.write(xMapped);
   Serial1.write(yMapped);
   Serial1.write(d2State);

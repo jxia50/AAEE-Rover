@@ -10,7 +10,7 @@ const int magnetPin = 7;
 bool magnetState = false; // track current state
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600);  // XBee is on hardware Serial (pins 0/1)
 
   leftMotor.attach(leftPin);
   rightMotor.attach(rightPin);
@@ -23,40 +23,41 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available() >= 5) { // X, Y, D2, D4, D9
-    int xVal = Serial.read();
-    int yVal = Serial.read();
-    int d2State = Serial.read();
-    int d4State = Serial.read();
-    int d9State = Serial.read();
+  // Look for a start marker (255)
+  if (Serial.available() >= 6) { // 1 start + 5 data bytes
+    int startByte = Serial.read();
+    if (startByte == 255) {
+      int xVal    = Serial.read();
+      int yVal    = Serial.read();
+      int d2State = Serial.read();
+      int d4State = Serial.read();
+      int d9State = Serial.read();
 
-    // Update magnet state
-    if (d4State == 1) {
-      magnetState = true;
-    } 
-    if (d9State == 1) {
-      magnetState = false;
-    }
+      // --- Magnet update ---
+      if (d4State == 1) magnetState = true;
+      if (d9State == 1) magnetState = false;
+      digitalWrite(magnetPin, magnetState ? HIGH : LOW);
 
-    // Apply magnet output
-    digitalWrite(magnetPin, magnetState ? HIGH : LOW);
+      // --- Movement (only if D2 held) ---
+      if (d2State == 1) {
+        int speed = map(xVal, 0, 255, -200, 200);   // forward/back
+        int turn  = map(yVal, 0, 255, 200, -200);   // left/right
 
-    // Robot movement (only if D2 held)
-    if (d2State == 1) {
-      int speed = map(xVal, 0, 255, -200, 200);
-      int turn  = map(yVal, 0, 255, 200, -200);
+        // Deadzone
+        const int deadzone = 20;
+        if (abs(speed) < deadzone) speed = 0;
+        if (abs(turn)  < deadzone) turn  = 0;
 
-      int leftSpeed  = speed + turn;
-      int rightSpeed = speed - turn;
+        int leftSpeed  = constrain(speed + turn, -200, 200);
+        int rightSpeed = constrain(speed - turn, -200, 200);
 
-      leftSpeed  = constrain(leftSpeed, -200, 200);
-      rightSpeed = constrain(rightSpeed, -200, 200);
-
-      leftMotor.writeMicroseconds(1500 - leftSpeed);
-      rightMotor.writeMicroseconds(1500 - rightSpeed);
-    } else {
-      leftMotor.writeMicroseconds(1500);
-      rightMotor.writeMicroseconds(1500);
+        leftMotor.writeMicroseconds(1500 - leftSpeed);
+        rightMotor.writeMicroseconds(1500 - rightSpeed);
+      } else {
+        // Stop when D2 not held
+        leftMotor.writeMicroseconds(1500);
+        rightMotor.writeMicroseconds(1500);
+      }
     }
   }
 }
