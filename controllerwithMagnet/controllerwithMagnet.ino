@@ -9,6 +9,7 @@ void setup() {
   pinMode(buttonD4, INPUT_PULLUP);
   pinMode(buttonD9, INPUT_PULLUP);
   Serial1.begin(9600);
+  // Serial.begin(9600);
 }
 
 void loop() {
@@ -28,6 +29,17 @@ void loop() {
   Serial1.write(d2State);
   Serial1.write(d4State);
   Serial1.write(d9State);
+
+  // Serial.print("X: ");
+  // Serial.print(xMapped);
+  // Serial.print(" | Y: ");
+  // Serial.print(yMapped);
+  // Serial.print(" | D2: ");
+  // Serial.print(d2State);
+  // Serial.print(" | D4: ");
+  // Serial.print(d4State);
+  // Serial.print(" | D9: ");
+  // Serial.println(d9State);
 
   delay(50);
 }

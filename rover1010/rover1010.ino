@@ -19,7 +19,7 @@ void setup() {
   pinMode(magnetPin, OUTPUT);
   digitalWrite(magnetPin, LOW); // start OFF
 
-  leftMotor.writeMicroseconds(1500);
+  leftMotor.writeMicroseconds(1485);
   rightMotor.writeMicroseconds(1500);
 }
 
@@ -52,11 +52,11 @@ void loop() {
         int leftSpeed  = constrain(speed + turn, -200, 200);
         int rightSpeed = constrain(speed - turn, -200, 200);
 
-        leftMotor.writeMicroseconds(1500 - leftSpeed);
+        leftMotor.writeMicroseconds(1485 - leftSpeed);
         rightMotor.writeMicroseconds(1500 - rightSpeed);
       } else {
         // Stop when D2 not held
-        leftMotor.writeMicroseconds(1500);
+        leftMotor.writeMicroseconds(1485);
         rightMotor.writeMicroseconds(1500);
       }
     }
