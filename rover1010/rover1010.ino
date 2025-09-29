@@ -42,7 +42,7 @@ void loop() {
       // --- Movement (only if D2 held) ---
       if (d2State == 1) {
         int speed = map(xVal, 0, 255, -200, 200);   // forward/back
-        int turn  = map(yVal, 0, 255, 200, -200);   // left/right
+        int turn  = map(yVal, 0, 255, -200, 200);   // left/right -- flipped the signs to flip control
 
         // Deadzone
         const int deadzone = 20;
